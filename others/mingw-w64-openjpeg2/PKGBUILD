@@ -8,7 +8,7 @@ depends=(mingw-w64-libpng mingw-w64-lcms2)
 makedepends=(mingw-w64-cmake)
 options=(staticlibs !strip !buildflags)
 url="https://www.openjpeg.org"
-source=("https://github.com/uclouvain/openjpeg/archive/v$pkgver.tar.gz"
+source=("openjpeg-$pkgver.tar.gz::https://github.com/uclouvain/openjpeg/archive/v$pkgver.tar.gz"
 "0001-fix-install-for-dlls.all.patch"
 "0003-versioned-dlls.mingw.patch"
 "0005-sock-jpip.all.patch")
