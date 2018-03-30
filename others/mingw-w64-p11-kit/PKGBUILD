@@ -1,6 +1,6 @@
 
 pkgname=mingw-w64-p11-kit
-pkgver=0.23.7+60+gd8acebf
+pkgver=0.23.10+14+gba6ebb0
 pkgrel=1
 pkgdesc="Provides a way to load and enumerate PKCS#11modules (mingw-w64)"
 arch=(any)
@@ -9,7 +9,7 @@ license=('BSD')
 depends=('mingw-w64-crt' 'mingw-w64-libtasn1' 'mingw-w64-libffi')
 makedepends=('mingw-w64-configure')
 options=('staticlibs' '!buildflags' '!strip')
-_commit=d8acebf175d727a3e146956fb362c30e7fdec9df  # before pwd.h is included
+_commit=ba6ebb05fc0c8010d8510984ce3c5f908edf13b6  # after MinGW fix
 source=("git+https://github.com/p11-glue/p11-kit#commit=$_commit"
         0001-Build-and-install-libnssckbi-p11-kit.so.patch)
 sha256sums=('SKIP'
