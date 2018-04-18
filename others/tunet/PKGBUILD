@@ -1,26 +1,28 @@
 #Maintainer:xgdgsc
 
 pkgname="tunet"
-pkgver="2015"
+pkgver="2018"
 pkgrel=1
 pkgdesc="Tsinghua University network authentication client for Linux."
 arch=("i686" "x86_64")
 url="http://net.tsinghua.edu.cn"
 license=('Unknown')
-source=("http://net.tsinghua.edu.cn/files/Tunet2015_linux.rar" "TUNet.desktop" "logo.png")
-md5sums=('c4c286c59a3baf453cc08c3654511ceb'
-         'd6b304623a091c60cc0bec418de4cd38'
-         'e4c03714b61b1d3906865c08672348d9')
+source=("http://auth4.tsinghua.edu.cn/files/Tunet_linux2018.zip"
+        "TUNet.desktop"
+        "logo.png")
+sha256sums=('1eb32120b2d771e15860f54da8be2aa002c0f2aa04bedcc7c7ec4370445d9912'
+            '77c1f0b9dca5ae0c255bbfa322fe4d596e1b142d9e1169af10e583259bc9f999'
+            'cd4990f789f16c746c16f6cdf3a5a12281b5e196b0c2df5e832e64a1e1b62bed')
 install='tunet.install'
-makedepends=('unrar')
-#depends=('glib2')
+# makedepends=('unzip')
+# depends=('glib2')
 
 package() {
   cd "${srcdir}"
-  tar -xzvf Tunet2015.$CARCH.tgz
+  tar -xzvf Tunet2018.$CARCH.tgz
   mkdir -p "${pkgdir}/opt/TUNet"
   mkdir -p "${pkgdir}/usr/share/applications/"
   cp logo.png "${pkgdir}/opt/TUNet/"
-  cp bin/Tunet2015* "${pkgdir}/opt/TUNet/"
+  cp bin/Tunet2018* "${pkgdir}/opt/TUNet/"
   cp "${srcdir}/TUNet.desktop" "${pkgdir}/usr/share/applications/"
 }
