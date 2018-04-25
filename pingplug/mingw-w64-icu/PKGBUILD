@@ -4,17 +4,18 @@
 # Contributor: Alexey Pavlov <Alexpux@gmail.com>
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
 
-_realname=icu
-pkgname=mingw-w64-${_realname}
+_architectures="i686-w64-mingw32 x86_64-w64-mingw32"
+
+pkgname=mingw-w64-icu
 pkgver=61.1
 pkgrel=1
-arch=(any)
 pkgdesc="International Components for Unicode library (mingw-w64)"
+arch=('any')
 url="http://site.icu-project.org"
-license=("custom:icu")
+license=('custom')
 depends=('mingw-w64-crt>=5.0.3.20170801')
-makedepends=(mingw-w64-configure)
-options=(!buildflags staticlibs !strip !emptydirs)
+makedepends=('mingw-w64-configure')
+options=('!strip' 'staticlibs' '!buildflags')
 source=("http://download.icu-project.org/files/icu4c/${pkgver}/icu4c-${pkgver//./_}-src.tgz"
         "https://ssl.icu-project.org/files/icu4c/${pkgver}/icu4c-${pkgver//./_}-src.tgz.asc"
         "0008-data-install-dir.mingw.patch"
@@ -34,8 +35,6 @@ sha256sums=('d007f89ae8a2543a53525c74359b65b36412fa84b3349f1400be6dcf409fafef'
             '8ff9d33de05e34906177ba1ae7ca44c4bab246353919c50f7b201548354602b2'
             'f9c6c5ad51a82b547ca34cbd7903c4f0db4c7f6d08867e7fd54c2bcf8ad8ae56')
 validpgpkeys=("FFA9129A180D765B7A5BEA1C9B432B27D1BA20D7")
-
-_architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 prepare() {
   cd icu
@@ -61,7 +60,7 @@ build() {
   for _arch in ${_architectures}; do
     mkdir build-${_arch} && pushd build-${_arch}
     ${_arch}-configure \
-      --with-cross-build=$PWD/../nativebuild \
+      --with-cross-build=${PWD}/../nativebuild \
       --with-data-packaging=library \
       --disable-rpath \
       --enable-release \
@@ -73,14 +72,16 @@ build() {
 }
 
 package() {
-  mkdir -p "$pkgdir/usr/bin"
+  mkdir -p "${pkgdir}/usr/bin"
   for _arch in ${_architectures}; do
-    cd "$srcdir/icu/source/build-${_arch}"
-    make install DESTDIR="$pkgdir"
-    mv "$pkgdir"/usr/${_arch}/lib/*.dll "$pkgdir"/usr/${_arch}/bin
-    find "$pkgdir/usr/${_arch}" -name '*.exe' -exec ${_arch}-strip {} \;
-    find "$pkgdir/usr/${_arch}" -name '*.dll' -exec ${_arch}-strip --strip-unneeded {} \;
-    find "$pkgdir/usr/${_arch}" -name '*.a' -o -name '*.dll' | xargs ${_arch}-strip -g
-    ln -s "/usr/${_arch}/bin/icu-config" "$pkgdir/usr/bin/${_arch}-icu-config"
+    cd "${srcdir}/icu/source/build-${_arch}"
+    make install DESTDIR="${pkgdir}"
+    mv "${pkgdir}"/usr/${_arch}/lib/*.dll "${pkgdir}"/usr/${_arch}/bin
+    find "${pkgdir}/usr/${_arch}" -name '*.exe' -exec ${_arch}-strip {} \;
+    find "${pkgdir}/usr/${_arch}" -name '*.dll' -exec ${_arch}-strip --strip-unneeded {} \;
+    find "${pkgdir}/usr/${_arch}" -name '*.a' -o -name '*.dll' | xargs ${_arch}-strip -g
+    ln -s "/usr/${_arch}/bin/icu-config" "${pkgdir}/usr/bin/${_arch}-icu-config"
   done
 }
+
+# vim:set ts=2 sw=2 et:
