@@ -5,41 +5,40 @@
 _targets="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-gcc-base
-pkgver=7.3.1
-_gccver=7.3.1
-_islver=0.18
+pkgver=8.1.0
+_islver=0.19
 _gmpver=6.1.2
 _mpfrver=4.0.1
 _mpcver=1.1.0
 pkgrel=1
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler, bootstrap"
-_snapshot=7-20180301
+#_snapshot=7-20180301
 arch=('x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=('mingw-w64-toolchain' 'mingw-w64')
 depends=('zlib' 'mingw-w64-binutils' 'mingw-w64-headers')
 makedepends=('gcc-ada')
-#checkdepends=('dejagnu') # Windows executables could run on Arch through bin_mft and Wine
 optdepends=()
 provides=()
 replaces=()
 backup=()
 options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
 source=(#"https://sources.archlinux.org/other/gcc/gcc-${pkgver/+/-}.tar.xz"{,.sig}
-    #"https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-${_gccver}/gcc-${_gccver}.tar.xz"{,.sig}
-    "https://gcc.gnu.org/pub/gcc/snapshots/$_snapshot/gcc-$_snapshot.tar.xz"
-	"http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
-    "https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-${_gmpver}.tar.xz"{,.sig}
-    "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"{,.sig}
-    "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpc/mpc-${_mpcver}.tar.gz"{,.sig})
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz"{,.sig}
+        #"https://gcc.gnu.org/pub/gcc/snapshots/$_snapshot/gcc-$_snapshot.tar.xz"
+	    "http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-${_gmpver}.tar.xz"{,.sig}
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"{,.sig}
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpc/mpc-${_mpcver}.tar.gz"{,.sig})
 validpgpkeys=('F3691687D867B81B51CE07D9BBE43771487328A9' # bpiotrowski@archlinux.org
               'AD17A21EF8AED8F1CC02DBD9F7D5C9BF765C61E3' # andreas@enge.fr
               '07F3DBBECC1A39605078094D980C197698C3739D' # vincent@vinc17.net
               '343C2FF0FBEE5EC2EDBEF399F3599FF828C67298') # nisse@lysator.liu.se
 
-sha256sums=('e63910b82c55af11e60f5767fb4a7794cca1a57be7f56609eb56d52bac5658d2'
-            '6b8b0fd7f81d0a957beb3679c81bbb34ccc7568d5682844d8924424a0dadcb1b'
+sha256sums=('1d1866f992626e61349a1ccd0b8d5253816222cdc13390dcfaa74b093aa2b153'
+            'SKIP'
+            'd59726f34f7852a081fbd3defd1ab2136f174110fc2e0c8d10bb122173fa9ed8'
             '87b565e89a9a684fe4ebeeddb8399dce2599f9c9049854ca8c0dfbdea0e21912'
             'SKIP'
             '67874a60826303ee2fb6affc6dc0ddd3e749e9bfcb4c8655e3953d0458a6e16e'
@@ -48,8 +47,8 @@ sha256sums=('e63910b82c55af11e60f5767fb4a7794cca1a57be7f56609eb56d52bac5658d2'
             'SKIP')
 
 prepare() {
-  #mv gcc-${pkgver/+/-} gcc
-  mv gcc-${_snapshot} gcc
+  mv gcc-${pkgver/+/-} gcc
+  #mv gcc-${_snapshot} gcc
   cd "$srcdir"/gcc
   # link isl for in-tree builds
   ln -sf ../isl-${_islver} isl
@@ -63,6 +62,7 @@ prepare() {
 
 build() {
   for _target in ${_targets}; do
+    msg2 "Building ${_target}"
     mkdir -p "$srcdir"/gcc-build-${_target} && cd "$srcdir"/gcc-build-${_target}
 
     "$srcdir"/gcc/configure \
