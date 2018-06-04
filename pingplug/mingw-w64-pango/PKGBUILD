@@ -19,6 +19,7 @@ depends=('mingw-w64-harfbuzz'
 makedepends=('mingw-w64-configure'
              'gtk-doc'
              'gobject-introspection'
+             'mingw-w64-meson'
              'git')
 options=('!strip' 'staticlibs' '!buildflags')
 source=("git+https://git.gnome.org/browse/pango#commit=${_commit}"
