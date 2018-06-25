@@ -39,7 +39,7 @@ ccache = false
 
 # Link libstdc++ statically into the librustc_llvm instead of relying on a
 # dynamic version to be available.
-static-libstdcpp = true
+static-libstdcpp = false
 
 # Tell the LLVM build system to use Ninja instead of the platform default for
 # the generated build system. This can sometimes be faster than make, for
@@ -120,7 +120,7 @@ submodules = true
 
 # Update submodules only when the checked out commit in the submodules differs
 # from what is committed in the main rustc repo.
-fast-submodules = false
+fast-submodules = true
 
 # The path to (or name of) the GDB executable to use. This is only used for
 # executing the debuginfo test suite.
@@ -252,7 +252,7 @@ codegen-units = 0
 debug-assertions = false
 
 # Whether or not debuginfo is emitted
-debuginfo = true
+debuginfo = false
 
 # Whether or not line number debug information is emitted
 debuginfo-lines = false
@@ -260,7 +260,11 @@ debuginfo-lines = false
 # Whether or not to only build debuginfo for the standard library if enabled.
 # If enabled, this will not compile the compiler with debuginfo, just the
 # standard library.
-debuginfo-only-std = true
+#debuginfo-only-std = false
+
+# Enable debuginfo for the extended tools: cargo, rls, rustfmt
+# Adding debuginfo makes them several times larger.
+debuginfo-tools = false
 
 # Whether or not jemalloc is built and enabled
 use-jemalloc = true
@@ -333,11 +337,17 @@ codegen-backends-dir = "codegen-backends"
 # Flag indicating whether `libstd` calls an imported function to handle basic IO
 # when targeting WebAssembly. Enable this to debug tests for the `wasm32-unknown-unknown`
 # target, as without this option the test output will not be captured.
-wasm-syscall = false
+#wasm-syscall = false
 
 # Indicates whether LLD will be compiled and made available in the sysroot for
 # rustc to execute.
 lld = true
+
+# Whether to deny warnings in crates
+deny-warnings = true
+
+# Print backtrace on internal compiler errors during bootstrap
+backtrace-on-ice = false
 
 # =============================================================================
 # Options for specific targets
@@ -366,7 +376,7 @@ ar = "ar"
 linker = "cc"
 
 # Path to the `llvm-config` binary of the installation of a custom LLVM to link
-# against. Note that if this is specifed we don't compile LLVM at all for this
+# against. Note that if this is specified we don't compile LLVM at all for this
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
@@ -416,7 +426,7 @@ ar = "i686-w64-mingw32-ar"
 linker = "i686-w64-mingw32-cc"
 
 # Path to the `llvm-config` binary of the installation of a custom LLVM to link
-# against. Note that if this is specifed we don't compile LLVM at all for this
+# against. Note that if this is specified we don't compile LLVM at all for this
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
@@ -466,7 +476,7 @@ ar = "x86_64-w64-mingw32-ar"
 linker = "x86_64-w64-mingw32-cc"
 
 # Path to the `llvm-config` binary of the installation of a custom LLVM to link
-# against. Note that if this is specifed we don't compile LLVM at all for this
+# against. Note that if this is specified we don't compile LLVM at all for this
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
