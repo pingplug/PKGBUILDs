@@ -7,13 +7,13 @@
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-icu
-pkgver=61.1
+pkgver=62.1
 pkgrel=1
 pkgdesc="International Components for Unicode library (mingw-w64)"
 arch=('any')
 url="http://site.icu-project.org"
 license=('custom')
-depends=('mingw-w64-crt>=5.0.3.20170801')
+depends=('mingw-w64-crt>=5.0.4.20170801')
 makedepends=('mingw-w64-configure')
 options=('!strip' 'staticlibs' '!buildflags')
 source=("http://download.icu-project.org/files/icu4c/${pkgver}/icu4c-${pkgver//./_}-src.tgz"
@@ -25,7 +25,7 @@ source=("http://download.icu-project.org/files/icu4c/${pkgver}/icu4c-${pkgver//.
         "0015-debug.mingw.patch"
         "0016-icu-pkgconfig.patch"
         "0017-icu-config-versioning.patch")
-sha256sums=('d007f89ae8a2543a53525c74359b65b36412fa84b3349f1400be6dcf409fafef'
+sha256sums=('3dd9868d666350dda66a6e305eecde9d479fb70b30d5b55d78a1deffb97d5aa3'
             'SKIP'
             '2038881890542797fe1fe9a384cf2bb6c5504b18fb26eab1368f5cb0e6f7f7af'
             '2adfd968379888d919f0dd4e0379cef7b744ba56d98216b82372ed4cd00a2592'

@@ -39,7 +39,7 @@ ccache = false
 
 # Link libstdc++ statically into the librustc_llvm instead of relying on a
 # dynamic version to be available.
-static-libstdcpp = false
+static-libstdcpp = true
 
 # Tell the LLVM build system to use Ninja instead of the platform default for
 # the generated build system. This can sometimes be faster than make, for
@@ -184,7 +184,7 @@ configure-args = []
 
 # Indicates that a local rebuild is occurring instead of a full bootstrap,
 # essentially skipping stage0 as the local compiler is recompiling itself again.
-local-rebuild = false
+local-rebuild = true
 
 # Print out how long each rustbuild step took (mostly intended for CI and
 # tracking over time)
@@ -245,7 +245,7 @@ optimize = true
 # Number of codegen units to use for each compiler invocation. A value of 0
 # means "the number of cores on this machine", and 1+ is passed through to the
 # compiler.
-codegen-units = 0
+codegen-units = 1
 
 # Whether or not debug assertions are enabled for the compiler and standard
 # library. Also enables compilation of debug! and trace! logging macros.
@@ -260,11 +260,11 @@ debuginfo-lines = false
 # Whether or not to only build debuginfo for the standard library if enabled.
 # If enabled, this will not compile the compiler with debuginfo, just the
 # standard library.
-#debuginfo-only-std = false
+debuginfo-only-std = false
 
 # Enable debuginfo for the extended tools: cargo, rls, rustfmt
 # Adding debuginfo makes them several times larger.
-debuginfo-tools = false
+#debuginfo-tools = false
 
 # Whether or not jemalloc is built and enabled
 use-jemalloc = true
@@ -337,7 +337,7 @@ codegen-backends-dir = "codegen-backends"
 # Flag indicating whether `libstd` calls an imported function to handle basic IO
 # when targeting WebAssembly. Enable this to debug tests for the `wasm32-unknown-unknown`
 # target, as without this option the test output will not be captured.
-#wasm-syscall = false
+wasm-syscall = false
 
 # Indicates whether LLD will be compiled and made available in the sysroot for
 # rustc to execute.
