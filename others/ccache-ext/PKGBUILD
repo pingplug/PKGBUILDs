@@ -3,17 +3,19 @@
 # Contributor: Giovanni Scafora <giovanni@archlinux.org>
 # Contributor: Tom Newsom <Jeepster@gmx.co.uk>
 
-_mingw_arch="i686-w64-mingw32 x86_64-w64-mingw32"
-
 pkgname=ccache-ext
 pkgver=1
 pkgrel=1
-pkgdesc='more compiler link for ccache'
+pkgdesc='more compiler links for ccache'
 arch=('any')
 license=('custom')
 depends=('ccache')
-source=('nvcc-ccache')
-sha256sums=('c6db8aaddb625d28050e67122d3b1bf50d1e1e8d6a04cdca3dc195521b53f3c4')
+source=('nvcc-ccache'
+        'update-ccache-links'
+        'update-ccache-links.hook')
+sha256sums=('c6db8aaddb625d28050e67122d3b1bf50d1e1e8d6a04cdca3dc195521b53f3c4'
+            '9b6944d277f3739aa305f1809c56b940f060cb505fb57baf5102ec190ba43c27'
+            '4152050e2c354763f5121eb6494f95b2e9b0418e5379a52d2b553683a9b78460')
 
 package() {
   install -d "${pkgdir}/usr/lib/ccache/bin"
@@ -22,49 +24,10 @@ package() {
     # /usr/lib/ccache/bin/nvcc cauese CMake failed to find CUDA
     install -Dm755 nvcc-ccache "${pkgdir}/usr/lib/ccache/bin/"
   fi
-  # GCC
-  if pacman -T "aarch64-linux-gnu-gcc" ; then
-    _arch=aarch64-linux-gnu
-    for _prog in gcc g++ c++; do
-      ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/${_arch}-${_prog}"
-    done
-  fi
-  if pacman -T "arm-none-eabi-gcc" ; then
-    _arch=arm-none-eabi
-    for _prog in gcc g++ c++; do
-      ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/${_arch}-${_prog}"
-    done
-  fi
-  if pacman -T "avr-gcc" ; then
-    _arch=avr
-    for _prog in gcc g++ c++; do
-      ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/${_arch}-${_prog}"
-    done
-  fi
-  if pacman -T "gcc54" ; then
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/g++-5"
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/gcc-5"
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/c++-5"
-  fi
-  if pacman -T "gcc7" ; then
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/g++-7"
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/gcc-7"
-    ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/c++-7"
-  fi
-  if pacman -T "riscv64-linux-gnu-gcc" ; then
-    _arch=riscv64-linux-gnu
-    for _prog in gcc g++ c++; do
-      ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/${_arch}-${_prog}"
-    done
-  fi
-  # GCC in AUR
-  if pacman -T "mingw-w64-gcc" ; then
-    for _arch in ${_mingw_arch} ; do
-      for _prog in cc gcc g++ c++; do
-        ln -s /usr/bin/ccache "${pkgdir}/usr/lib/ccache/bin/${_arch}-${_prog}"
-      done
-    done
-  fi
+  install -d "${pkgdir}/usr/bin"
+  install -Dm755 update-ccache-links "${pkgdir}/usr/bin/"
+  install -d "${pkgdir}/usr/share/libalpm/hooks"
+  install -Dm644 update-ccache-links.hook "${pkgdir}/usr/share/libalpm/hooks/"
 }
 
 # vim: ts=2 sw=2 et:

@@ -5,14 +5,14 @@
 _targets="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-gcc-base
-pkgver=8.1.1
+pkgver=8.2.0
 _islver=0.19
 _gmpver=6.1.2
 _mpfrver=4.0.1
 _mpcver=1.1.0
 pkgrel=1
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler, bootstrap"
-_snapshot=8-20180601
+#_snapshot=8-20180601
 arch=('x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -25,8 +25,8 @@ replaces=()
 backup=()
 options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
 source=(#"https://sources.archlinux.org/other/gcc/gcc-${pkgver/+/-}.tar.xz"{,.sig}
-        #"https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz"{,.sig}
-        "https://gcc.gnu.org/pub/gcc/snapshots/$_snapshot/gcc-$_snapshot.tar.xz"
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz"{,.sig}
+        #"https://gcc.gnu.org/pub/gcc/snapshots/$_snapshot/gcc-$_snapshot.tar.xz"
 	    "http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-${_gmpver}.tar.xz"{,.sig}
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"{,.sig}
@@ -37,7 +37,8 @@ validpgpkeys=('F3691687D867B81B51CE07D9BBE43771487328A9' # bpiotrowski@archlinux
               '07F3DBBECC1A39605078094D980C197698C3739D' # vincent@vinc17.net
               '343C2FF0FBEE5EC2EDBEF399F3599FF828C67298') # nisse@lysator.liu.se
 
-sha256sums=('f348ab66acf84f8c8cc28bb7fdea131b9016c1a1d9b7e23e93127c13062400de'
+sha256sums=('196c3c04ba2613f893283977e6011b2345d1cd1af9abeac58e916b1aab3e0080'
+            'SKIP'
             'd59726f34f7852a081fbd3defd1ab2136f174110fc2e0c8d10bb122173fa9ed8'
             '87b565e89a9a684fe4ebeeddb8399dce2599f9c9049854ca8c0dfbdea0e21912'
             'SKIP'

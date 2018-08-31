@@ -1,12 +1,12 @@
 # Maintainer: pingplug <pingplug@foxmail.com>
 # Contributor: Schala Zeal <schalaalexiazeal@gmail.com>
 
-_commit=5d46e21df66a11233186ddf27ca8c70149307871  # after a bug fix
+_commit=a6a89818246b0b14c0fe3d00d6120929fc0a11d9  # tags/1.42.4^0
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-pango
-pkgver=1.42.1+4+g5d46e21d
-pkgrel=3
+pkgver=1.42.4
+pkgrel=1
 pkgdesc="A library for layout and rendering of text (mingw-w64)"
 arch=('any')
 url="http://www.pango.org"
@@ -19,6 +19,7 @@ depends=('mingw-w64-harfbuzz'
 optdepends=('mingw-w64-libthai: libthai support')
 makedepends=('gtk-doc'
              'gobject-introspection'
+             'mingw-w64-poppler'
              'mingw-w64-meson'
              'mingw-w64-wine'
              'git')
@@ -34,6 +35,8 @@ pkgver() {
 prepare() {
   cd "${srcdir}/pango"
 
+  # disable help2man when cross building
+  sed -i "s/^if help2man.found()/if help2man.found() and not meson.is_cross_build()/g" utils/meson.build
 }
 
 build() {
