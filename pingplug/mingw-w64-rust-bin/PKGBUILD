@@ -1,18 +1,18 @@
 # Maintainer: pingplug <pingplug@foxmail.com>
 
 _pkgname=rust
-_cargo=0.29.0
+_cargo=0.30.0
 
 pkgname=mingw-w64-rust-bin
-pkgver=1.28.0
-pkgrel=1
-pkgdesc="Systems programming language focused on safety, speed and concurrency (official build, mingw-w64)"
+pkgver=1.29.0
+pkgrel=2
+pkgdesc="Systems programming language focused on safety, speed and concurrency (PLEASE READ COMMENTS FIRST) (official build, mingw-w64)"
 arch=('x86_64')
 url="https://www.rust-lang.org"
 license=('MIT' 'Apache' 'custom')
 depends=('gcc-libs'
          'curl'
-         'mingw-w64-crt<5.0.4.20180112'
+         'mingw-w64-crt'
          'libgit2'
          'mingw-w64-gcc')
 optdepends=('mingw-w64-wine: for cargo test support')
@@ -20,20 +20,20 @@ provides=("mingw-w64-rust=${pkgver}")
 conflicts=('mingw-w64-rust')
 options=('!strip' 'staticlibs' '!buildflags')
 
-source=("https://static.rust-lang.org/dist/cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
-        "https://static.rust-lang.org/dist/rustc-${pkgver}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
-        "https://static.rust-lang.org/dist/rust-std-${pkgver}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
-        "https://static.rust-lang.org/dist/rust-std-${pkgver}-i686-pc-windows-gnu.tar.xz"{,.asc}
-        "https://static.rust-lang.org/dist/rust-std-${pkgver}-x86_64-pc-windows-gnu.tar.xz"{,.asc})
-sha256sums=('2e62f91aab9ea496209a060e7ec62f088f5081b568a28b88f3c8ea7073db9829'
+source=("https://static.rust-lang.org/dist/cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
+        "https://static.rust-lang.org/dist/rustc-${pkgver}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
+        "https://static.rust-lang.org/dist/rust-std-${pkgver}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
+        "https://static.rust-lang.org/dist/rust-std-${pkgver}-i686-pc-windows-gnu.tar.gz"{,.asc}
+        "https://static.rust-lang.org/dist/rust-std-${pkgver}-x86_64-pc-windows-gnu.tar.gz"{,.asc})
+sha256sums=('3f7ddbee6c5bfb65dfd8ff97e8412ea12b9d0b1bf669a445a245bfc2497bdfd1'
             'SKIP'
-            '193f5e18e15152c26d1b09b97ee72f334a0e9ef8f0ba05187a3f20dc02443c4f'
+            '229c51d51efc239e6eb9b428795bb7f57309f11287705dcba4877d5e220102a0'
             'SKIP'
-            '80aca8c46aa724c91f7cb7fc038c8c94e6648e73156e9f35e1f73bc5dd5b0249'
+            '0bed2fcba596e1af6f56ed3f5d481b89b28a4ac26aea07128c6630c00c6a136b'
             'SKIP'
-            '47288679bea8e81c9413fb530378b9f4a9bb47f46de5517de48f0ba210020b9b'
+            'ac366d37101506c6e3ca8b5cf4f1fe6193f88a20570128ceb9da890b1666455e'
             'SKIP'
-            '685102a86203938af8935c792fe4818c02ff4705cf76bcaf5abde7da415a04fb'
+            '0072002b3a1daa951bd07b9847b2015729f88c5428a9b007d9cb2cece901c9e5'
             'SKIP')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
 
@@ -95,7 +95,7 @@ package() {
 
   # strip
   strip --strip-all "${pkgdir}/opt/${_pkgname}/bin/"{cargo,rustc,rustdoc}
-  strip --strip-all "${pkgdir}/opt/${_pkgname}/lib/rustlib/x86_64-unknown-linux-gnu/bin/"lld
+  strip --strip-all "${pkgdir}/opt/${_pkgname}/lib/rustlib/x86_64-unknown-linux-gnu/bin/"rust-lld
   strip --strip-unneeded "${pkgdir}/opt/${_pkgname}/lib/rustlib/x86_64-unknown-linux-gnu/lib/"*.so
   strip --strip-unneeded "${pkgdir}/opt/${_pkgname}/lib/rustlib/x86_64-unknown-linux-gnu/codegen-backends/"*.so
   i686-w64-mingw32-strip --strip-unneeded "${pkgdir}/opt/${_pkgname}/lib/rustlib/i686-pc-windows-gnu/lib/"*.dll
@@ -142,11 +142,6 @@ EOF
   if [[ ! -f "/usr/x86_64-w64-mingw32/bin/libgcc_s_seh-1.dll" ]] ; then
     cat << EOF >> "${pkgdir}/opt/${_pkgname}/cargo/config"
              "-C", "panic=abort",
-EOF
-  fi
-  if pacman -T "mingw-w64-crt-git>5.0.4.20171219" ; then
-    cat << EOF >> "${pkgdir}/opt/${_pkgname}/cargo/config"
-             "-C", "link-arg=-lmsvcrt",
 EOF
   fi
   cat << EOF >> "${pkgdir}/opt/${_pkgname}/cargo/config"

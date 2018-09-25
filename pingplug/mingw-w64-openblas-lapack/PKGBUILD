@@ -40,9 +40,16 @@ build() {
     cp -a "${_pkgname}-${pkgver}" "${_pkgname}-build-${_arch}"
     pushd "${_pkgname}-build-${_arch}"
 
-    make ${BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran libs
-    make ${BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran netlib
-    make ${BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran shared
+    if [ "${_arch}" = "i686-w64-mingw32" ]
+    then
+      _BUILDFLAG="${BUILDFLAG} BINARY=32"
+    else
+      _BUILDFLAG="${BUILDFLAG} BINARY=64"
+    fi
+
+    make ${_BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran libs
+    make ${_BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran netlib
+    make ${_BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran shared
     popd
   done
 }
@@ -51,8 +58,16 @@ check() {
   cd ${srcdir}
   for _arch in ${_architectures}; do
     pushd "${_pkgname}-build-${_arch}"
+
+    if [ "${_arch}" = "i686-w64-mingw32" ]
+    then
+      _BUILDFLAG="${BUILDFLAG} BINARY=32"
+    else
+      _BUILDFLAG="${BUILDFLAG} BINARY=64"
+    fi
+
     # this is actually build tests only, not execute test
-    make ${BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran tests
+    make ${_BUILDFLAG} CC=${_arch}-gcc FC=${_arch}-gfortran tests
     popd
   done
 }
