@@ -3,6 +3,7 @@ Operation = Install
 Operation = Upgrade
 Operation = Remove
 Type = File
+Target = usr/bin/update-ccache-links
 Target = usr/bin/c++
 Target = usr/bin/cc
 Target = usr/bin/clang
