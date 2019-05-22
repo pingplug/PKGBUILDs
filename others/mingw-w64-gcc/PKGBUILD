@@ -5,14 +5,15 @@
 _targets="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-gcc
-pkgver=8.2.0
-_islver=0.19
+pkgver=9.1.0
+#_pkgver=8.2.1+20181127
+#_snapshot=9-20181125
+_islver=0.21
 _gmpver=6.1.2
-_mpfrver=4.0.1
+_mpfrver=4.0.2
 _mpcver=1.1.0
 pkgrel=1
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler"
-#_snapshot=8-20180601
 arch=('x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -27,10 +28,10 @@ replaces=('mingw-w64-gcc-base')
 conflicts=('mingw-w64-gcc-base')
 backup=()
 options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
-source=(#"https://sources.archlinux.org/other/gcc/gcc-${pkgver/+/-}.tar.xz"{,.sig}
+source=(#"https://sources.archlinux.org/other/gcc/gcc-${_pkgver/+/-}.tar.xz"{,.sig}
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz"{,.sig}
         #"https://gcc.gnu.org/pub/gcc/snapshots/$_snapshot/gcc-$_snapshot.tar.xz"
-	    "http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
+	    "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-${_gmpver}.tar.xz"{,.sig}
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"{,.sig}
         "https://mirrors.tuna.tsinghua.edu.cn/gnu/mpc/mpc-${_mpcver}.tar.gz"{,.sig})
@@ -40,18 +41,24 @@ validpgpkeys=('F3691687D867B81B51CE07D9BBE43771487328A9' # bpiotrowski@archlinux
               '07F3DBBECC1A39605078094D980C197698C3739D' # vincent@vinc17.net
               '343C2FF0FBEE5EC2EDBEF399F3599FF828C67298') # nisse@lysator.liu.se
 
-sha256sums=('196c3c04ba2613f893283977e6011b2345d1cd1af9abeac58e916b1aab3e0080'
+sha256sums=('79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0'
             'SKIP'
-            'd59726f34f7852a081fbd3defd1ab2136f174110fc2e0c8d10bb122173fa9ed8'
+            '777058852a3db9500954361e294881214f6ecd4b594c00da5eee974cd6a54960'
             '87b565e89a9a684fe4ebeeddb8399dce2599f9c9049854ca8c0dfbdea0e21912'
             'SKIP'
-            '67874a60826303ee2fb6affc6dc0ddd3e749e9bfcb4c8655e3953d0458a6e16e'
+            '1d3be708604eae0e42d578ba93b390c2a145f17743a744d8f3f8c2ad5855a38a'
             'SKIP'
             '6985c538143c1208dcb1ac42cedad6ff52e267b47e5f970183a3e75125b43c2e'
             'SKIP')
 
+pkgver() {
+  cd "${srcdir}/gcc/gcc"
+  cat BASE-VER
+}
+
 prepare() {
-  mv gcc-${pkgver/+/-} gcc
+  #mv gcc-${_pkgver/+/-} gcc
+  mv gcc-${pkgver} gcc
   #mv gcc-${_snapshot} gcc
   cd "$srcdir"/gcc
   # link isl for in-tree builds
