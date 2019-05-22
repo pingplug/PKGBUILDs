@@ -1,14 +1,14 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
-# Contributor: Jens Staal <staal1978@gmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Jens Staal < staal1978 at gmail dot com >
 # adopted from mingw-w64-pdcurses package:
-# Contributor: Filip Brcic <brcha@gna.org>
+# Contributor: Filip Brcic < brcha at gna dot org >
 
-_commit=10ee49e4fb96a808aed0882374dcc22b668db722  # tags/4.0.2^1
+_commit=96f9dc577e6b30242b1a2e8f5489cdd77a6182a9  # tags/4.1.0^1
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-pdcurses-win32a
-pkgver=4.0.2
-pkgrel=2
+pkgver=4.1.0
+pkgrel=1
 pkgdesc="Curses library on the Win32 API for MinGW-w64"
 arch=('any')
 url="https://www.projectpluto.com/win32a.htm"
@@ -19,8 +19,7 @@ makedepends=('mingw-w64-gcc'
 provides=('mingw-w64-pdcurses')
 conflicts=('mingw-w64-pdcurses')
 options=('!strip' 'staticlibs' '!buildflags')
-source=(#"http://www.projectpluto.com/win32a.zip"
-        "git+https://github.com/Bill-Gray/PDCurses.git#commit=${_commit}"
+source=("git+https://github.com/Bill-Gray/PDCurses.git#commit=${_commit}"
         "pdcurses.diff")
 sha256sums=('SKIP'
             '246f93facdd2703f8b9d0bcd57e89688fd861d34a30facc60a48892b330b08bc')
@@ -34,13 +33,13 @@ prepare() {
 build() {
   cd "${srcdir}/PDCurses"
   for _arch in ${_architectures}; do
-    cp -a win32a build-${_arch}-static && pushd build-${_arch}-static
-    make -f mingwin32.mak \
+    cp -a wingui build-${_arch}-static && pushd build-${_arch}-static
+    make -f Makefile.mng \
       PREFIX="${_arch}-" \
       WIDE=Y UTF8=Y
     popd
-    cp -a win32a build-${_arch}-shared && pushd build-${_arch}-shared
-    make -f mingwin32.mak \
+    cp -a wingui build-${_arch}-shared && pushd build-${_arch}-shared
+    make -f Makefile.mng \
       PREFIX="${_arch}-" \
       WIDE=Y UTF8=Y DLL=Y
     popd

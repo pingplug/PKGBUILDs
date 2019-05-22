@@ -1,17 +1,17 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
-# Contributor: Johannes Löthberg <johannes@kyriasis.com>
-# Contributor: Alexander F Rødseth <xyproto@archlinux.org>
-# Contributor: Daniel Micay <danielmicay@gmail.com>
-# Contributor: userwithuid <userwithuid@gmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Johannes Löthberg < johannes at kyriasis dot com >
+# Contributor: Alexander F Rødseth < xyproto at archlinux dot org >
+# Contributor: Daniel Micay < danielmicay at gmail dot com >
+# Contributor: userwithuid < userwithuid at gmail dot com >
 
 _pkgname=rust
-_date=2018-10-12
-_rustc=1.29.2
-_cargo=0.30.0
+_date=2019-02-28
+_rustc=1.33.0
+_cargo=0.34.0
 
 pkgname=mingw-w64-rust
-_prefix=usr
-pkgver=1.30.1
+_prefix=opt/rust
+pkgver=1.34.2
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('x86_64')
@@ -26,27 +26,27 @@ makedepends=('gdb'
              'ninja'
              'libffi'
              'perl'
-             'python2'
+             'python'
              'nodejs'
              'cmake')
 options=('!strip' 'staticlibs' '!buildflags')
 source=("https://static.rust-lang.org/dist/rustc-${pkgver}-src.tar.xz"{,.asc}
-        "https://static.rust-lang.org/dist/${_date}/rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
-        "https://static.rust-lang.org/dist/${_date}/rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
-        "https://static.rust-lang.org/dist/${_date}/cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.gz"{,.asc}
+        "https://static.rust-lang.org/dist/${_date}/rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
+        "https://static.rust-lang.org/dist/${_date}/rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
+        "https://static.rust-lang.org/dist/${_date}/cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.xz"{,.asc}
         "mingw-config.toml")
-noextract=("rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.gz"
-           "rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.gz"
-           "cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.gz")
-sha256sums=('76c824e26b6a554cd48f45993e42001816c2f515dd1b252e3c8315fe200155ae'
+noextract=("rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"
+           "rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"
+           "cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.xz")
+sha256sums=('2b3b3a5462aa31d07f39721af73ef394803ceae3472e2470f28b7ee0b12e38ef'
             'SKIP'
-            '1fe9a0f354256483a354ee1b51c60bf9f3f48868581f7cb36d0cc51a82400605'
+            '6f20343ed73faf5fdfc423bec38a9bb1910a0a962af6f2dddd7184407543ed0e'
             'SKIP'
-            'b04146b09edc4bad0de7c8fa1a5a2aa4416d365c03c5962b8a5b26c7047b7cc9'
+            '57c5ced1a826d34f26e50adf041528dd0000f2a59e8be32d2359386843382ce1'
             'SKIP'
-            '32f210fd3142fda7825a06e95d1aa4b54035c2da435d8cf0dd03fad410c8002f'
+            '1730c8ebcacc1327eb28b328cb9f5a2c612bb3d9efff9c350647adf19f304e15'
             'SKIP'
-            'b493540a9053daddeb466edbf2a9416e51b075ded81649938bc4e4b11dce2bd8')
+            'd7b86ebb3382c838cb931ed0292e4a8133dd524beed7abe0f3ab8d7bc5973d04')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
 
 backup=("opt/rust/cargo/config")
@@ -57,13 +57,15 @@ prepare() {
 
   cp "${srcdir}"/mingw-config.toml config.toml
   sed -i "s|\@PREFIX\@|/${_prefix}|" config.toml
-  cd "${srcdir}/rustc-${pkgver}-src/src/bootstrap"
+  # use level 0 to speed up xz packaging
+  sed -i 's|XzEncoder::new(create_new_file(tar_xz)?, 6)|XzEncoder::new(create_new_file(tar_xz)?, 0)|' "src/tools/rust-installer/src/tarballer.rs"
+  sed -i "s|tar.gz|tar.xz|" "src/bootstrap/bootstrap.py"
 
   cd "${srcdir}"
   mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
-  cp rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
-  cp rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
-  cp cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.xz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.xz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.xz "rustc-${pkgver}-src/build/cache/${_date}"
 }
 
 build() {
@@ -71,7 +73,8 @@ build() {
 
   export CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
   export CXXFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
-  python2 ./x.py build
+  # BUG: x.py install will build rust a second time
+  #python ./x.py build
 }
 
 package() {
@@ -81,9 +84,7 @@ package() {
   export CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
   export CXXFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
   # TODO: find a way to disable packaging
-  # use level 0 to speed up xz packaging
-  sed -i 's|XzEncoder::new(create_new_file(tar_xz)?, 6)|XzEncoder::new(create_new_file(tar_xz)?, 0)|' "src/tools/rust-installer/src/tarballer.rs"
-  DESTDIR="${pkgdir}" python2 ./x.py install
+  DESTDIR="${pkgdir}" python ./x.py install
 
   # license
   install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}/"{rust,cargo}

@@ -67,7 +67,7 @@ targets = "X86"
 # the same format as above, but since these targets are experimental, they are
 # not built by default and the experimental Rust compilation targets that depend
 # on them will not work unless the user opts in to building them. By default the
-# `WebAssembly` target is enabled when compiling LLVM from scratch.
+# `WebAssembly` and `RISCV` targets are enabled when compiling LLVM from scratch.
 experimental-targets = ""
 
 # Cap the number of parallel linker invocations when compiling LLVM.
@@ -89,6 +89,21 @@ link-shared = false
 # On MSVC you can compile LLVM with clang-cl, but the test suite doesn't pass
 # with clang-cl, so this is special in that it only compiles LLVM with clang-cl
 #clang-cl = '/path/to/clang-cl.exe'
+
+# Pass extra compiler and linker flags to the LLVM CMake build.
+#cflags = "-fextra-flag"
+#cxxflags = "-fextra-flag"
+#ldflags = "-Wl,extra-flag"
+
+# Use libc++ when building LLVM instead of libstdc++. This is the default on
+# platforms already use libc++ as the default C++ library, but this option
+# allows you to use libc++ even on platforms when it's not. You need to ensure
+# that your host compiler ships with libc++.
+use-libcxx = false
+
+# The value specified here will be passed as `-DLLVM_USE_LINKER` to CMake.
+#use-linker = "lld"
+
 
 # =============================================================================
 # General build configuration options
@@ -182,10 +197,9 @@ sanitizers = false
 # Build the profiler runtime
 profiler = false
 
-# Indicates whether the OpenSSL linked into Cargo will be statically linked or
-# not. If static linkage is specified then the build system will download a
-# known-good version of OpenSSL, compile it, and link it to Cargo.
-openssl-static = false
+# Indicates whether the native libraries linked into Cargo will be statically
+# linked or not.
+cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
@@ -243,26 +257,47 @@ localstatedir = "/var/lib"
 # =============================================================================
 [rust]
 
-# Indicates that the build should be optimized for debugging Rust. Note that
-# this is typically not what you want as it takes an incredibly large amount of
-# time to have a debug-mode rustc compile any code (notably libstd). If this
-# value is set to `true` it will affect a number of configuration options below
-# as well, if unconfigured.
-debug = false
-
-# Whether or not to optimize the compiler and standard library
+# Whether or not to optimize the compiler and standard library.
+#
 # Note: the slowness of the non optimized compiler compiling itself usually
 #       outweighs the time gains in not doing optimizations, therefore a
-#       full bootstrap takes much more time with optimize set to false.
+#       full bootstrap takes much more time with `optimize` set to false.
 optimize = true
+
+# Indicates that the build should be configured for debugging Rust. A
+# `debug`-enabled compiler and standard library will be somewhat
+# slower (due to e.g. checking of debug assertions) but should remain
+# usable.
+#
+# Note: If this value is set to `true`, it will affect a number of
+#       configuration options below as well, if they have been left
+#       unconfigured in this file.
+#
+# Note: changes to the `debug` setting do *not* affect `optimize`
+#       above. In theory, a "maximally debuggable" environment would
+#       set `optimize` to `false` above to assist the introspection
+#       facilities of debuggers like lldb and gdb. To recreate such an
+#       environment, explicitly set `optimize` to `false` and `debug`
+#       to `true`. In practice, everyone leaves `optimize` set to
+#       `true`, because an unoptimized rustc with debugging
+#       enabled becomes *unusably slow* (e.g. rust-lang/rust#24840
+#       reported a 25x slowdown) and bootstrapping the supposed
+#       "maximally debuggable" environment (notably libstd) takes
+#       hours to build.
+#
+debug = false
 
 # Number of codegen units to use for each compiler invocation. A value of 0
 # means "the number of cores on this machine", and 1+ is passed through to the
 # compiler.
 codegen-units = 1
 
+# Sets the number of codegen units to build the standard library with,
+# regardless of what the codegen-unit setting for the rest of the compiler is.
+codegen-units-std = 1
+
 # Whether or not debug assertions are enabled for the compiler and standard
-# library. Also enables compilation of debug! and trace! logging macros.
+# library.
 debug-assertions = false
 
 # Whether or not debuginfo is emitted
@@ -280,20 +315,14 @@ debuginfo-only-std = false
 # Adding debuginfo makes them several times larger.
 #debuginfo-tools = false
 
-# Whether or not jemalloc is built and enabled
-use-jemalloc = true
-
-# Whether or not jemalloc is built with its debug option set
-debug-jemalloc = false
-
 # Whether or not `panic!`s generate backtraces (RUST_BACKTRACE)
 backtrace = true
 
 # Whether to always use incremental compilation when building rustc
 incremental = false
 
-# Build rustc with experimental parallelization
-experimental-parallel-queries = false
+# Build a multi-threaded rustc
+parallel-compiler = false
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
@@ -322,6 +351,7 @@ debuginfo-tests = false
 
 # Flag indicating whether codegen tests will be run or not. If you get an error
 # saying that the FileCheck executable is missing, you may want to disable this.
+# Also see the target's llvm-filecheck option.
 codegen-tests = true
 
 # Flag indicating whether git info will be retrieved from .git automatically.
@@ -381,6 +411,15 @@ verify-llvm-ir = false
 # generally only set for releases
 remap-debuginfo = false
 
+# Link the compiler against `jemalloc`, where on Linux and OSX it should
+# override the default allocator for rustc and LLVM.
+jemalloc = false
+
+# Run tests in various test suites with the "nll compare mode" in addition to
+# running the tests in normal mode. Largely only used on CI and during local
+# development of NLL
+test-compare-mode = false
+
 # =============================================================================
 # Options for specific targets
 #
@@ -416,9 +455,9 @@ linker = "cc"
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
-# Path to the custom jemalloc static library to link into the standard library
-# by default. This is only used if jemalloc is still enabled above
-#jemalloc = "/path/to/jemalloc/libjemalloc_pic.a"
+# Normally the build system can find LLVM's FileCheck utility, but if
+# not, you can specify an explicit file name for it.
+#llvm-filecheck = "/path/to/FileCheck"
 
 # If this target is for Android, this option will be required to specify where
 # the NDK for the target lives. This is used to find the C compiler to link and
@@ -470,9 +509,9 @@ linker = "i686-w64-mingw32-cc"
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
-# Path to the custom jemalloc static library to link into the standard library
-# by default. This is only used if jemalloc is still enabled above
-#jemalloc = "/path/to/jemalloc/libjemalloc_pic.a"
+# Normally the build system can find LLVM's FileCheck utility, but if
+# not, you can specify an explicit file name for it.
+#llvm-filecheck = "/path/to/FileCheck"
 
 # If this target is for Android, this option will be required to specify where
 # the NDK for the target lives. This is used to find the C compiler to link and
@@ -524,9 +563,9 @@ linker = "x86_64-w64-mingw32-cc"
 # target.
 #llvm-config = "../path/to/llvm/root/bin/llvm-config"
 
-# Path to the custom jemalloc static library to link into the standard library
-# by default. This is only used if jemalloc is still enabled above
-#jemalloc = "/path/to/jemalloc/libjemalloc_pic.a"
+# Normally the build system can find LLVM's FileCheck utility, but if
+# not, you can specify an explicit file name for it.
+#llvm-filecheck = "/path/to/FileCheck"
 
 # If this target is for Android, this option will be required to specify where
 # the NDK for the target lives. This is used to find the C compiler to link and
@@ -584,3 +623,7 @@ crt-static = true
 # as the one built on Windows will contain backslashes in paths causing problems
 # on linux
 #src-tarball = true
+#
+
+# Whether to allow failures when building tools
+#missing-tools = false

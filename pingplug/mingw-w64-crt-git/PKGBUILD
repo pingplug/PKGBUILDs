@@ -1,14 +1,14 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: ant32 <antreimer@gmail.com>
-# Contributor: rubenvb vanboxem <dottie> ruben <attie> gmail <dottie> com
-# Contributor: rkitover <rkitover@gmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Sergej Pupykin < pupykin dot s+arch at gmail dot com >
+# Contributor: ant32 < antreimer at gmail dot com >
+# Contributor: rubenvb < vanboxem dot ruben at gmail dot com >
+# Contributor: rkitover < rkitover at gmail dot com >
 
 _pkgver=6.0.0
 _targets="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-crt-git
-pkgver=6.0.0.20180923
+pkgver=6.0.0.20190518
 pkgrel=1
 pkgdesc="MinGW-w64 CRT for Windows (git version)"
 arch=('any')

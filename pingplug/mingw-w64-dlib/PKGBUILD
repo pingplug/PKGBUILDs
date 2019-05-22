@@ -1,25 +1,26 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
 
 _pkgname=dlib
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-dlib
-pkgver=19.16
-pkgrel=1
+pkgver=19.17
+pkgrel=2
 pkgdesc="A general purpose cross-platform C++ library designed using contract programming and modern C++ techniques (mingw-w64)"
 arch=('any')
 url="http://www.dlib.net"
 license=('custom')
-depends=('mingw-w64-crt')
+depends=('mingw-w64-crt'
+         'mingw-w64-cblas'
+         'mingw-w64-lapack'
+         'mingw-w64-libjpeg'
+         'mingw-w64-libpng')
 optdepends=('mingw-w64-giflib: for GIF support'
-            'mingw-w64-lapack: for BLAS and LAPACK support'
-            'mingw-w64-libjpeg: for JPEG support'
-            'mingw-w64-libpng: for PNG support'
             'mingw-w64-sqlite: for sqlite support')
 makedepends=('mingw-w64-cmake')
 options=('!strip' 'staticlibs' '!buildflags')
 source=("https://downloads.sourceforge.net/project/dclib/${_pkgname}/v${pkgver}/${_pkgname}-${pkgver}.tar.bz2")
-sha256sums=('37308406c2b1459a70f21ec2fd7bdc922277659534c708323cb28d6e8e4764a8')
+sha256sums=('24772f9b2b99cf59a85fd1243ca1327cbf7340d83395b32a6c16a3a16136327b')
 
 build() {
   cd ${srcdir}
@@ -28,9 +29,6 @@ build() {
     mkdir -p "${_pkgname}-build-${_arch}-shared" && pushd "${_pkgname}-build-${_arch}-shared"
     ${_arch}-cmake \
       -DBUILD_SHARED_LIBS:BOOL=ON \
-      -DUSE_AVX_INSTRUCTIONS:BOOL=ON \
-      -DUSE_SSE2_INSTRUCTIONS:BOOL=ON \
-      -DUSE_SSE4_INSTRUCTIONS:BOOL=ON \
       "../${_pkgname}-${pkgver}"
     make
     popd
@@ -38,9 +36,6 @@ build() {
     mkdir -p "${_pkgname}-build-${_arch}-static" && pushd "${_pkgname}-build-${_arch}-static"
     ${_arch}-cmake \
       -DBUILD_SHARED_LIBS:BOOL=OFF \
-      -DUSE_AVX_INSTRUCTIONS:BOOL=ON \
-      -DUSE_SSE2_INSTRUCTIONS:BOOL=ON \
-      -DUSE_SSE4_INSTRUCTIONS:BOOL=ON \
       "../${_pkgname}-${pkgver}"
     make
     popd

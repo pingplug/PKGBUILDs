@@ -1,10 +1,10 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
-# Contributor: Schala Zeal <schalaalexiazeal@gmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Schala Zeal < schalaalexiazeal at gmail dot com >
 
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
 pkgname=mingw-w64-openjpeg2
-pkgver=2.3.0
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="An open source JPEG 2000 codec, version ${pkgver} (mingw-w64)"
 arch=('any')
@@ -16,19 +16,16 @@ makedepends=('mingw-w64-cmake')
 options=('!strip' 'staticlibs' '!buildflags')
 source=("openjpeg-${pkgver}.tar.gz::https://github.com/uclouvain/openjpeg/archive/v${pkgver}.tar.gz"
         "0001-fix-install-for-dlls.all.patch"
-        "0003-versioned-dlls.mingw.patch"
-        "0005-sock-jpip.all.patch")
-sha256sums=('3dc787c1bb6023ba846c2a0d9b1f6e179f1cd255172bde9eb75b01f1e6c7d71a'
+        "0003-versioned-dlls.mingw.patch")
+sha256sums=('63f5a4713ecafc86de51bfad89cc07bb788e9bba24ebbf0c4ca637621aadb6a9'
             '3f3bde353ca3432f157258164c5e3c345af82ca3a9d5a68f815c3030b01cbc32'
-            'a221300d278f1a57b1ea5c70314702cd4234a2560ed2335bd5940fd921e78eda'
-            'b7b22dca26d5fd98ca5bc6ce775bbbabebc0e10fcf07fd0afb54d580699b8312')
+            '4d8d0310d24e7ec0a54cf71c06ff85831e37841046e13744e58f53b87e691560')
 
 prepare() {
   cd openjpeg-${pkgver}
   sed -i '/add_subdirectory(thirdparty)/d' CMakeLists.txt
   patch -p1 -i "${srcdir}"/0001-fix-install-for-dlls.all.patch
   patch -p1 -i "${srcdir}"/0003-versioned-dlls.mingw.patch
-  patch -p1 -i "${srcdir}"/0005-sock-jpip.all.patch
 }
 
 build() {
