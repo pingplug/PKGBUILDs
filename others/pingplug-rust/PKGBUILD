@@ -1,20 +1,20 @@
-# Maintainer: pingplug <pingplug@foxmail.com>
-# Contributor: Johannes Löthberg <johannes@kyriasis.com>
-# Contributor: Alexander F Rødseth <xyproto@archlinux.org>
-# Contributor: Daniel Micay <danielmicay@gmail.com>
-# Contributor: userwithuid <userwithuid@gmail.com>
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Johannes Löthberg < johannes at kyriasis dot com >
+# Contributor: Alexander F Rødseth < xyproto at archlinux dot org >
+# Contributor: Daniel Micay < danielmicay at gmail dot com >
+# Contributor: userwithuid < userwithuid at gmail dot com >
 
 _pkgname=rust
-_date=2019-02-28
-_rustc=1.33.0
-_cargo=0.34.0
+_date=2020-02-27
+_rustc=1.41.1
+_cargo=0.42.0
 
-_cargo_ver=0.35.0
-_rustfmt_ver=1.0.3
+_cargo_ver=0.43.0
+_rustfmt_ver=1.4.11
 _prefix=usr
 
 pkgname=pingplug-rust
-pkgver=1.34.2
+pkgver=1.42.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (pingplug)"
 arch=('x86_64')
@@ -43,6 +43,7 @@ makedepends=('gdb'
              'llvm'
              'perl'
              'python'
+             'nodejs'
              'procps-ng'
              'cmake')
 options=('!strip' 'staticlibs' '!buildflags')
@@ -54,15 +55,15 @@ source=("https://static.rust-lang.org/dist/rustc-${pkgver}-src.tar.xz"{,.asc}
 noextract=("rust-std-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"
            "rustc-${_rustc}-x86_64-unknown-linux-gnu.tar.xz"
            "cargo-${_cargo}-x86_64-unknown-linux-gnu.tar.xz")
-sha256sums=('2b3b3a5462aa31d07f39721af73ef394803ceae3472e2470f28b7ee0b12e38ef'
+sha256sums=('aa5b4c0f2bac33cc26a11523fce9b0f120d2eff510ed148ae7c586501481ed04'
             'SKIP'
-            '6f20343ed73faf5fdfc423bec38a9bb1910a0a962af6f2dddd7184407543ed0e'
+            '8e0d2ccfaaeec2e2007b3a605e2bf1dac2e2c82a8d4168bf4e81c9dd5374214e'
             'SKIP'
-            '57c5ced1a826d34f26e50adf041528dd0000f2a59e8be32d2359386843382ce1'
+            'cf5051c312ae70b00dedf269ea71499c392087428677f961c3b4ac9da64a92b9'
             'SKIP'
-            '1730c8ebcacc1327eb28b328cb9f5a2c612bb3d9efff9c350647adf19f304e15'
+            '390156ca95741ea62e18952e2a703437ab4ad400064a22a23a2bffe9a337e8a8'
             'SKIP'
-            '19f88fe6c79285d0af826184005d13f4ebd4965472fa5f14d3d7af6e1c3f5d4e')
+            'a7af42ff35f55c9828a09b3c3fcf6070c5bc53010f374ea2626c8759e50594f9')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
 
 backup=("opt/rust/cargo/config")
@@ -74,8 +75,7 @@ prepare() {
   cp "${srcdir}"/pingplug-config.toml config.toml
   sed -i "s|\@PREFIX\@|/${_prefix}|" config.toml
   # use level 0 to speed up xz packaging
-  sed -i 's|XzEncoder::new(create_new_file(tar_xz)?, 6)|XzEncoder::new(create_new_file(tar_xz)?, 0)|' "src/tools/rust-installer/src/tarballer.rs"
-  sed -i "s|tar.gz|tar.xz|" "src/bootstrap/bootstrap.py"
+  sed -i 's|.preset(6)|.preset(0)|' "src/tools/rust-installer/src/tarballer.rs"
 
   cd "${srcdir}"
   mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
@@ -87,18 +87,17 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  export CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
-  export CXXFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
-  # ./x.py install will build rust from stage1 again
-  #python ./x.py build
+  export CFLAGS="-O2 -pipe -fno-plt -Wall -D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
+  export CXXFLAGS="-O2 -pipe -fno-plt -Wall -D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
+  python ./x.py build
 }
 
 package() {
   cd "rustc-${pkgver}-src"
 
   # rust will build install tools there
-  export CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
-  export CXXFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
+  export CFLAGS="-O2 -pipe -fno-plt -Wall -D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
+  export CXXFLAGS="-O2 -pipe -fno-plt -Wall -D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
   # TODO: find a way to disable packaging
   DESTDIR="${pkgdir}" python ./x.py install
 
@@ -132,14 +131,16 @@ package() {
 
   # strip
   strip --strip-all "${pkgdir}/${_prefix}/bin/"{cargo,cargo-clippy,cargo-fmt,clippy-driver,rls,rustc,rustdoc,rustfmt}
+  strip --strip-unneeded "${pkgdir}/${_prefix}/lib/librustc"*.so
   strip --strip-unneeded "${pkgdir}/${_prefix}/lib/rustlib/i686-unknown-linux-gnu/lib/"*.so
   strip --strip-unneeded "${pkgdir}/${_prefix}/lib/rustlib/x86_64-unknown-linux-gnu/lib/"*.so
-  strip --strip-unneeded "${pkgdir}/${_prefix}/lib/rustlib/x86_64-unknown-linux-gnu/codegen-backends/"*.so
   i686-w64-mingw32-strip --strip-unneeded "${pkgdir}/${_prefix}/lib/rustlib/i686-pc-windows-gnu/lib/"*.dll
   x86_64-w64-mingw32-strip --strip-unneeded "${pkgdir}/${_prefix}/lib/rustlib/x86_64-pc-windows-gnu/lib/"*.dll
 
   # change analyze
-  sed -i "s|${srcdir}/rustc-${pkgver}-src/src|/${_prefix}/lib/rustlib/src/rust/src|" "${pkgdir}/${_prefix}/lib/rustlib/"*"/analysis/"*.json
+  sed -i "s|${srcdir}/rustc-${pkgver}-src/src|/${_prefix}/lib/rustlib/src/rust/src|g" "${pkgdir}/${_prefix}/lib/rustlib/"*"/analysis/"*.json
+  sed -i "s|${srcdir}/rustc-${pkgver}-src/build|/BUILD_DIR|g" "${pkgdir}/${_prefix}/lib/rustlib/"*"/analysis/"*.json
+  sed -i "s|${srcdir}/rustc-${pkgver}-src|/COMPILATION_DIR|g" "${pkgdir}/${_prefix}/lib/rustlib/"*"/analysis/"*.json
 
   # config
   install -dm777 "${pkgdir}/opt/rust/cargo"
